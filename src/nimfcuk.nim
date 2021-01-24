@@ -33,3 +33,63 @@ proc xdec*(c: var char) {.inline.} =
   ## Decrement a character with wrapping instead of underflow checks.
   dec c
 {.pop.}
+
+proc interpret*(code: string; input, output: Stream) =
+  ## Interprets the brainfuck `code` string, reading from `input` and writing
+  ## to `output`.
+  ##
+  ## Example:
+  ## .. code:: nim
+  ##   var inpStream = newStringStream("Hello World!\n")
+  ##   var outStream = newFileStream(stdout)
+  ##   interpret(readFile("examples/rot13.b"), inpStream, outStream)
+  var
+    tape = newSeq[char]()
+    codePos = 0
+    tapePos = 0
+
+  proc run(skip = false): bool =
+    while tapePos >= 0 and codePos < code.len:
+      if tapePos >= tape.len:
+        tape.add '\0'
+
+      if code[codePos] == '[':
+        inc codePos
+        let oldPos = codePos
+        while run(tape[tapePos] == '\0'):
+          codePos = oldPos
+      elif code[codePos] == ']':
+        return tape[tapePos] != '\0'
+      elif not skip:
+        case code[codePos]
+        of '+': xinc tape[tapePos]
+        of '-': xdec tape[tapePos]
+        of '>': inc tapePos
+        of '<': dec tapePos
+        of '.': output.write tape[tapePos]
+        of ',': tape[tapePos] = input.readCharEOF
+        else: discard
+
+      inc codePos
+
+  discard run()
+
+proc interpret*(code, input: string): string =
+  ## Interprets the brainfuck `code` string, reading from `input` and returning
+  ## the result directly.
+  ##
+  ## Example:
+  ## .. code:: nim
+  ##   echo interpret(readFile("examples/rot13.b"), "Hello World!\n")
+  var outStream = newStringStream()
+  interpret(code, input.newStringStream, outStream)
+  result = outStream.data
+
+proc interpret*(code: string) =
+  ## Interprets the brainfuck `code` string, reading from stdin and writing to
+  ## stdout.
+  ##
+  ## Example:
+  ## .. code:: nim
+  ##   interpret(readFile("examples/rot13.b"))
+  interpret(code, stdin.newFileStream, stdout.newFileStream)
