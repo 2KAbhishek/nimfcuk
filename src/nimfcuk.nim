@@ -93,3 +93,41 @@ proc interpret*(code: string) =
   ## .. code:: nim
   ##   interpret(readFile("examples/rot13.b"))
   interpret(code, stdin.newFileStream, stdout.newFileStream)
+
+import macros
+
+proc compile(code, input, output: string): NimNode {.compiletime.} =
+  var stmts = @[newStmtList()]
+
+  template addStmt(text) =
+    stmts[stmts.high].add parseStmt(text)
+
+  addStmt """
+    when not compiles(newStringStream()):
+      static:
+        quit("Error: Import the streams module to compile brainfuck code", 1)
+    """
+
+  addStmt "var tape: array[1_000_000, char]"
+  addStmt "var inpStream = " & input
+  addStmt "var outStream = " & output
+  addStmt "var tapePos = 0"
+
+  for c in code:
+    case c
+    of '+': addStmt "xinc tape[tapePos]"
+    of '-': addStmt "xdec tape[tapePos]"
+    of '>': addStmt "inc tapePos"
+    of '<': addStmt "dec tapePos"
+    of '.': addStmt "outStream.write tape[tapePos]"
+    of ',': addStmt "tape[tapePos] = inpStream.readCharEOF"
+    of '[': stmts.add newStmtList()
+    of ']':
+      var loop = newNimNode(nnkWhileStmt)
+      loop.add parseExpr("tape[tapePos] != '\\0'")
+      loop.add stmts.pop
+      stmts[stmts.high].add loop
+    else: discard
+
+  result = stmts[0]
+  #echo result.repr
