@@ -170,3 +170,25 @@ macro compileFile*(filename: string) =
   ##   mandelbrot()
   compile(staticRead(filename.strval),
     "stdin.newFileStream", "stdout.newFileStream")
+
+when isMainModule:
+  import docopt, tables
+
+  let doc = """
+    nimfcuk
+    Usage:
+    nimfcuk (-i | --interpret) [<file.b>]
+    nimfcuk (-h | --help)
+    nimfcuk (-v | --version)
+    Options:
+    -h --help     Show this screen.
+    -v --version  Show version.
+    """
+
+  let args = docopt(doc, version = "nimfcuk 0.1.0")
+
+  if args["--interpret"] or args["-i"]:
+    let code = if args["<file.b>"]: readFile($args["<file.b>"])
+               else: readAll stdin
+
+    interpret(code)
