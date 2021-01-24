@@ -187,7 +187,7 @@ when isMainModule:
     -v --version  Show version.
     """
 
-  let args = docopt(doc, version = "nimfcuk 0.1.0")
+  let args = docopt(doc, version = "nimfcuk 0.1.1")
 
   if args["interpret"] or args["i"]:
     let code = if args["<file.b>"]: readFile($args["<file.b>"])
