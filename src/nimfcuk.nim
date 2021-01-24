@@ -24,3 +24,12 @@ proc readCharEOF*(input: Stream): char =
   if result == '\0': # Streams return 0 for EOF
     result = '\255'  # BF assumes EOF to be -1
 
+
+{.push overflowchecks: off.}
+proc xinc*(c: var char) {.inline.} =
+  ## Increment a character with wrapping instead of overflow checks.
+  inc c
+proc xdec*(c: var char) {.inline.} =
+  ## Decrement a character with wrapping instead of underflow checks.
+  dec c
+{.pop.}
