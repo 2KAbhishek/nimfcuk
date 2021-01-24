@@ -181,6 +181,7 @@ when isMainModule:
     nimfcuk (-h | --help)
     nimfcuk (-v | --version)
     Options:
+    -i --interpret [<file.b>] Runs the output of the brainfuck file.
     -h --help     Show this screen.
     -v --version  Show version.
     """
