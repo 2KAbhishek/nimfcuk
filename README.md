@@ -8,13 +8,13 @@
 ![Contributors](https://img.shields.io/github/contributors/2kabhishek/nimfcuk?style=plastic&color=f0f&label=Contributors)
 ![License](https://img.shields.io/github/license/2kabhishek/nimfcuk?style=plastic&color=555&label=License)
 
-nimfcuk is a `<utility/tool/feature>` that allows `<insert_target_audience>` to do `<action/task_it_does>`.
+nimfcuk is a brainfuck interpreter & compiler implemented in nim.
 
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
 
-- You have installed the latest version of `<coding_language/dependency/requirement_1>`
+- You have installed the latest version of `nim`, `nimble`.
 
 ## Installing nimfcuk
 
@@ -23,28 +23,28 @@ To install nimfcuk, follow these steps:
 ```bash
 git clone https://github.com/2kabhishek/nimfcuk
 cd nimfcuk
-<install_command>
+nimble build
+./nimfcuk i examples/hello.b
+
+# Or you can directly install
+nimble install nimfcuk
 ```
 
 ## Using nimfcuk
 
 ```bash
-USAGE:
-    command [FLAGS] [OPTIONS]
+    nimfcuk
 
-FLAGS:
-    -h, --help              Prints help information.
+    Usage:
+    nimfcuk (i | interpret) [<file.b>]
+    nimfcuk (-h | --help)
+    nimfcuk (-v | --version)
 
-OPTIONS:
-    -o, --option <value>    Option description. Options are: a, b. [default: a]
-
+    Options:
+    -i --interpret Shows the output of the brainfuck code.
+    -h --help     Show this screen.
+    -v --version  Show version.
 ```
-
-### To-Do
-
-- [x] Setup repo
-- [ ] Think real hard
-- [ ] Start typing
 
 Hit the :star: button if you found this useful.
 
