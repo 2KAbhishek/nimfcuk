@@ -131,3 +131,42 @@ proc compile(code, input, output: string): NimNode {.compiletime.} =
 
   result = stmts[0]
   #echo result.repr
+
+macro compileString*(code: string; input, output: untyped) =
+  ## Compiles the brainfuck code read from `filename` at compile time into Nim
+  ## code that reads from the `input` variable and writes to the `output`
+  ## variable, both of which have to be strings.
+  result = compile($code,
+    "newStringStream(" & $input & ")", "newStringStream()")
+  result.add parseStmt($output & " = outStream.data")
+
+macro compileString*(code: string) =
+  ## Compiles the brainfuck `code` string into Nim code that reads from stdin
+  ## and writes to stdout.
+  echo code
+  compile($code, "stdin.newFileStream", "stdout.newFileStream")
+
+macro compileFile*(filename: string; input, output: untyped) =
+  ## Compiles the brainfuck code read from `filename` at compile time into Nim
+  ## code that reads from the `input` variable and writes to the `output`
+  ## variable, both of which have to be strings.
+  ##
+  ## Example:
+  ## .. code-block:: nim
+  ##   proc rot13(input: string): string =
+  ##     compileFile("examples/rot13.b", input, result)
+  ##   echo rot13("Hello World!\n")
+  result = compile(staticRead(filename.strval),
+    "newStringStream(" & $input & ")", "newStringStream()")
+  result.add parseStmt($output & " = outStream.data")
+
+macro compileFile*(filename: string) =
+  ## Compiles the brainfuck code read from `filename` at compile time into Nim
+  ## code that reads from stdin and writes to stdout.
+  ##
+  ## Example:
+  ## .. code-block:: nim
+  ##   proc mandelbrot = compileFile("examples/mandelbrot.b")
+  ##   mandelbrot()
+  compile(staticRead(filename.strval),
+    "stdin.newFileStream", "stdout.newFileStream")
